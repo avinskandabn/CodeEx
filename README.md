@@ -120,3 +120,39 @@ function App() {
 
 
 export default App;
+
+
+import { BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
+
+const data = [
+  { name: "Data Centers", value: 14000 },
+  { name: "Networks", value: 15000 },
+  { name: "Devices", value: 25000 }
+];
+
+// Custom Chimney + Smoke Shape
+const ChimneyBar = (props: any) => {
+  const { x, y, width, height, fill } = props;
+  return (
+    <g>
+      {/* Chimney body */}
+      <rect x={x} y={y} width={width} height={height} fill={fill} rx={4} />
+
+      {/* Smoke (simple circles rising) */}
+      <circle cx={x + width / 2} cy={y - 10} r={6} fill="lightgray" opacity={0.7} />
+      <circle cx={x + width / 2} cy={y - 25} r={10} fill="gray" opacity={0.5} />
+      <circle cx={x + width / 2} cy={y - 45} r={14} fill="darkgray" opacity={0.3} />
+    </g>
+  );
+};
+
+export default function ChimneyChart() {
+  return (
+    <BarChart width={600} height={400} data={data} layout="vertical">
+      <XAxis type="number" />
+      <YAxis dataKey="name" type="category" />
+      <Tooltip />
+      <Bar dataKey="value" shape={<ChimneyBar />} fill="#8884d8" />
+    </BarChart>
+  );
+}
