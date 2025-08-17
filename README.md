@@ -155,4 +155,68 @@ export default function ChimneyChart() {
       <Bar dataKey="value" shape={<ChimneyBar />} fill="#8884d8" />
     </BarChart>
   );
+
+
+
+
+  new   
+
+
+
+  import React from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+
+const ChimneyShape = ({ x, y, width, height, fill }: any) => {
+  const chimneyTop = x + width / 2;
+  return (
+    <g>
+      {/* Chimney trapezoid (narrow top, wide bottom) */}
+      <polygon
+        points={`
+          ${x},${y + height} 
+          ${x + width},${y + height} 
+          ${x + width * 0.8},${y} 
+          ${x + width * 0.2},${y}
+        `}
+        fill={fill}
+      />
+
+      {/* Smoke bubbles */}
+      <circle cx={chimneyTop} cy={y - 10} r={8} fill="gray" opacity={0.6} />
+      <circle cx={chimneyTop + 10} cy={y - 25} r={12} fill="gray" opacity={0.5} />
+      <circle cx={chimneyTop - 15} cy={y - 45} r={16} fill="gray" opacity={0.4} />
+    </g>
+  );
+};
+
+const data = [
+  { name: "Data Centres", value: 14000 },
+  { name: "Network", value: 15000 },
+  { name: "Devices", value: 25000 },
+];
+
+export default function ChimneyChart() {
+  return (
+    <ResponsiveContainer width="100%" height={400}>
+      <BarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+
+        {/* Use custom chimney shape here */}
+        <Bar dataKey="value" fill="#3CB371" shape={<ChimneyShape />} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
 }
+
+
