@@ -1,39 +1,3 @@
-# CodeEx
-Test
-import React from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  LabelList,
-} from "recharts";
-
-type InfraDataType = {
-  name: string;
-  embodied: number;
-  operational: number;
-};
-
-type ResourceDataType = {
-  name: string;
-  emissions: number;
-};
-
-interface EmissionChartsProps {
-  infraData: InfraDataType[];
-  resourceData: ResourceDataType[];
-}
-
-const EmissionCharts: React.FC<EmissionChartsProps> = ({ infraData, resourceData }) => {
-  return (
-    <div style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
-      {/* Chart 1 - Breakdown by infrastructural components */}
-      <div style={{ flex: "1 1 500px", height: 400 }}>
         <h3>Breakdown by infrastructural components</h3>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -219,4 +183,43 @@ export default function ChimneyChart() {
   );
 }
 
+const SmokyChimney = (props: any) => {
+  const { x, y, width, height } = props;
 
+  const chimneyWidth = width * 0.6;
+  const chimneyX = x + width * 0.2;
+  const chimneyY = y;
+
+  // Puffy smoke circles (like your screenshot)
+  const circles = [
+    { cx: chimneyX + chimneyWidth / 2, cy: chimneyY, r: 12 },
+    { cx: chimneyX + chimneyWidth / 2 + 15, cy: chimneyY - 25, r: 18 },
+    { cx: chimneyX + chimneyWidth / 2 - 20, cy: chimneyY - 55, r: 25 },
+    { cx: chimneyX + chimneyWidth / 2 + 20, cy: chimneyY - 95, r: 30 },
+    { cx: chimneyX + chimneyWidth / 2 - 25, cy: chimneyY - 145, r: 35 },
+  ];
+
+  return (
+    <g>
+      {/* Chimney */}
+      <rect
+        x={chimneyX}
+        y={chimneyY}
+        width={chimneyWidth}
+        height={height}
+        fill="#66b2b2"
+      />
+
+      {/* Puffy Smoke */}
+      {circles.map((c, i) => (
+        <circle
+          key={i}
+          cx={c.cx}
+          cy={c.cy}
+          r={c.r}
+          fill="lightgray"
+        />
+      ))}
+    </g>
+  );
+};
