@@ -10,10 +10,10 @@ export interface RowData {
 
 interface Props {
   title: string;
-  variant: Variant; // "green" (lowest) or "red" (highest)
+  variant: Variant;
   rows: RowData[];
-  width?: number;   // optional (px)
-  height?: number;  // optional (px)
+  width?: number;
+  height?: number;
 }
 
 const ComplexityCard: React.FC<Props> = ({
@@ -21,186 +21,140 @@ const ComplexityCard: React.FC<Props> = ({
   variant,
   rows,
   width = 420,
-  height = 270,
+  height = 270
 }) => {
   return (
-    <div
-      className={`complexity-card ${variant}`}
-      style={{ width, height }}
-      data-variant={variant}
-    >
-      {/* Layer 1: back color polygon band */}
-      <div className="band" />
+    <div className={`complexity-card ${variant}`} style={{ width, height }}>
+      {/* Back layer: soft plate + right polygon stripe */}
+      <div className="band" aria-hidden="true" />
 
-      {/* Layer 2: white rectangle body */}
-      <div className="body" />
+      {/* Middle layer: white body (clips content) */}
+      <div className="body">
+        {/* Top layer: polygon header */}
+        <div className="label">{title}</div>
 
-      {/* Layer 3: polygon label/header */}
-      <div className="label">{title}</div>
-
-      {/* Table content */}
-      <table className="table">
-        <thead>
-          <tr>
-            <th>File name</th>
-            <th>Complexity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r, i) => (
-            <tr key={`${r.fileName}-${i}`}>
-              <td>{r.fileName}</td>
-              <td>{r.complexity}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>File name</th>
+                <th>Complexity</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, i) => (
+                <tr key={`${r.fileName}-${i}`}>
+                  <td>{r.fileName}</td>
+                  <td>{r.complexity}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
 
 export default ComplexityCard;
 
-.complexity-card {
+
+
+:root{
+  --green:#3abf6f;
+  --green-soft:#e8f6ee;
+  --red:#e65b53;
+  --red-soft:#fdeceb;
+  --card-radius:12px;
+  --shadow:0 2px 10px rgba(0,0,0,.06);
+  --border:#e6e6ea;
+}
+
+.complexity-card{
   position: relative;
-  border-radius: 12px;
-  overflow: visible; // we want the header to float a little
+  border-radius: var(--card-radius);
   font-family: Inter, Arial, sans-serif;
 
-  // Layer 1: back polygon color band
-  .band {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    border-radius: 12px;
+  /* BACK LAYER */
+  .band{
+    position:absolute;
+    inset:0;
+    border-radius:var(--card-radius);
+    z-index:0;
+    overflow:hidden;
 
-    // the right color strip with an angled “head”
-    &::before {
-      content: "";
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 36%;
-      height: 92%;
-      border-bottom-right-radius: 12px;
-      border-bottom-left-radius: 4px;
-      // angled head (this shape is what you pointed out)
-      clip-path: polygon(16% 0, 100% 0, 100% 100%, 0 100%, 0 16%);
+    &::after{
+      content:"";
+      position:absolute;
+      right:8px;
+      top:8px;
+      bottom:8px;
+      width:34%;
+      border-bottom-right-radius:var(--card-radius);
+      border-bottom-left-radius:6px;
+      clip-path: polygon(18% 0, 100% 0, 100% 100%, 0 100%, 0 16%);
+      z-index:0;
     }
   }
+  &.green .band{ background:var(--green-soft); }
+  &.red   .band{ background:var(--red-soft); }
+  &.green .band::after{ background:var(--green); }
+  &.red   .band::after{ background:var(--red); }
 
-  // Layer 2: the white rectangle body
-  .body {
-    position: absolute;
-    inset: 10px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
-    border: 1px solid #e6e6ea;
-    z-index: 1;
+  /* MIDDLE LAYER */
+  .body{
+    position:absolute;
+    inset:10px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:var(--card-radius);
+    box-shadow:var(--shadow);
+    z-index:1;
+    overflow:hidden; /* CRITICAL: table stays inside white card */
   }
 
-  // Layer 3: polygon header/label
-  .label {
-    position: absolute;
-    right: 10px;
-    top: -2px;
-    height: 46px;
-    line-height: 46px;
-    padding: 0 16px;
-    color: #fff;
-    font-weight: 700;
-    border-top-right-radius: 12px;
-    border-top-left-radius: 10px;
-    z-index: 2;
-    letter-spacing: .2px;
-    // polygon tail to mimic the screenshot
-    clip-path: polygon(0 0, 100% 0, 100% 76%, 86% 76%, 76% 100%, 0 100%);
+  /* TOP LAYER (attached to body) */
+  .label{
+    position:absolute;
+    top:-12px;
+    left:18px;
+    height:44px;
+    line-height:44px;
+    padding:0 16px;
+    color:#fff;
+    font-weight:700;
+    letter-spacing:.2px;
+    border-radius:10px 10px 0 0;
+    clip-path: polygon(0 0, 100% 0, 100% 78%, 86% 78%, 76% 100%, 0 100%);
+    z-index:2;
   }
+  &.green .label{ background:var(--green); }
+  &.red   .label{ background:var(--red); }
 
-  // Table inside the card
-  .table {
-    position: absolute;
-    inset: 56px 18px 18px 18px;
-    width: calc(100% - 36px);
-    border-collapse: collapse;
-    font-size: 14px;
-
-    thead th {
-      text-align: left;
-      padding: 8px 10px;
-      border-bottom: 1px solid #e9e9ee;
-      color: #333;
-    }
-
-    tbody td {
-      padding: 12px 10px;
-      border-bottom: 1px solid #f0f0f4;
-      color: #444;
-    }
-
-    tr:last-child td {
-      border-bottom: 0;
-    }
-
-    // subtle column divider like your screenshot
-    th:first-child, td:first-child {
-      border-right: 1px solid #efeff4;
-    }
+  /* TABLE */
+  .table-wrap{
+    position:absolute;
+    inset:44px 14px 14px 14px;
+    overflow:auto;
   }
-
-  // Color variants (match both band and label)
-  &.green {
-    .band { background: #e8f6ee; }
-    .band::before, .label { background: #3abf6f; } // green
+  table{ width:100%; border-collapse:collapse; }
+  th, td{ background:#fff; font-size:14px; }
+  thead th{
+    text-align:left;
+    padding:10px 10px;
+    border-bottom:1px solid #e9e9ee;
+    color:#333;
   }
-
-  &.red {
-    .band { background: #fdeceb; }
-    .band::before, .label { background: #e65b53; } // red
+  tbody td{
+    padding:12px 10px;
+    border-bottom:1px solid #f0f0f4;
+    color:#444;
   }
+  tbody tr:last-child td{ border-bottom:0; }
+  th:first-child, td:first-child{ border-right:1px solid #efeff4; }
 }
 
 
-
-import React from "react";
-import ComplexityCard, { RowData } from "./ComplexityCard";
-import "./ComplexityPair.scss";
-
-interface Props {
-  lowest: RowData[];
-  highest: RowData[];
-}
-
-const ComplexityPair: React.FC<Props> = ({ lowest, highest }) => {
-  return (
-    <div className="pair-wrap">
-      <ComplexityCard
-        title="Lowest complexities"
-        variant="green"
-        rows={lowest}
-      />
-      <ComplexityCard
-        title="Highest complexities"
-        variant="red"
-        rows={highest}
-      />
-    </div>
-  );
-};
-
-export default ComplexityPair;
-
-
-
-// In some page or container
-const rows = [
-  { fileName: "Aboutus123.java", complexity: "O(n)" },
-  { fileName: "Aboutus123.java", complexity: "O(n)" },
-  { fileName: "Aboutus123.java", complexity: "O(n)" },
-];
-
-<ComplexityPair lowest={rows} highest={rows} />;
 
 
 
