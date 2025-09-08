@@ -1,26 +1,65 @@
-function extractFiles(obj: any, result: any[] = []) {
-  if (!obj || typeof obj !== "object") return result;
+import React from "react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Label
+} from "recharts";
 
-  // If this object has a "files" array → process it
-  if (Array.isArray(obj.files)) {
-    obj.files.forEach((file) => {
-      if (file.name && file.fileComplexityCount) {
-        result.push({
-          name: file.name,
-          fileComplexityCount: file.fileComplexityCount,
-        });
-      }
-      // A file can itself have nested "files"
-      extractFiles(file, result);
-    });
-  }
+const data = [
+  { name: "Complied", value: 50 },
+  { name: "Pending", value: 17 },
+];
 
-  // Recursively check all keys of the current object
-  for (const key in obj) {
-    if (typeof obj[key] === "object") {
-      extractFiles(obj[key], result);
-    }
-  }
+const COLORS = ["#28a745", "#dc3545"]; // green and red
 
-  return result;
-}
+const ComplianceDonut: React.FC = () => {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+
+  return (
+    <ResponsiveContainer width={300} height={300}>
+      <PieChart>
+        <Pie
+          data={data}
+          innerRadius={80}
+          outerRadius={120}
+          paddingAngle={2}
+          dataKey="value"
+        >
+          {data.map((_, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+          {/* Center text */}
+          <Label
+            position="center"
+            content={({ viewBox }) => {
+              if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                return (
+                  <text
+                    x={viewBox.cx}
+                    y={viewBox.cy}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={20}
+                    fill="#000"
+                  >
+                    <tspan x={viewBox.cx} dy="-0.6em" fontSize={16}>
+                      Total
+                    </tspan>
+                    <tspan x={viewBox.cx} dy="1.2em" fontSize={28} fontWeight="bold">
+                      {total}
+                    </tspan>
+                  </text>
+                );
+              }
+              return null;
+            }}
+          />
+        </Pie>
+      </PieChart>
+    </ResponsiveContainer>
+  );
+};
+
+export default ComplianceDonut;
