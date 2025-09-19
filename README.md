@@ -1,65 +1,47 @@
-import React from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Label
-} from "recharts";
+import React, { useState } from "react";
 
-const data = [
-  { name: "Complied", value: 50 },
-  { name: "Pending", value: 17 },
-];
+const FileUploadTable: React.FC = () => {
+  const [currentSelectedFiles, setCurrentSelectedFiles] = useState<File[]>([]);
 
-const COLORS = ["#28a745", "#dc3545"]; // green and red
+  // Handle adding new files
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const newFiles = Array.from(event.target.files);
+      setCurrentSelectedFiles((prev) => [...prev, ...newFiles]);
+    }
+  };
 
-const ComplianceDonut: React.FC = () => {
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  // Handle removing a file
+  const handleRemove = (fileName: string) => {
+    setCurrentSelectedFiles((prev) =>
+      prev.filter((file) => file.name !== fileName)
+    );
+  };
 
   return (
-    <ResponsiveContainer width={300} height={300}>
-      <PieChart>
-        <Pie
-          data={data}
-          innerRadius={80}
-          outerRadius={120}
-          paddingAngle={2}
-          dataKey="value"
-        >
-          {data.map((_, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+    <div>
+      <input type="file" multiple onChange={handleFileChange} />
+
+      <table border={1} style={{ marginTop: "10px", width: "100%" }}>
+        <thead>
+          <tr>
+            <th>Files/folder path</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentSelectedFiles.map((file, index) => (
+            <tr key={`${file.name}-${index}`}>
+              <td>{file.name}</td>
+              <td>
+                <button onClick={() => handleRemove(file.name)}>Remove</button>
+              </td>
+            </tr>
           ))}
-          {/* Center text */}
-          <Label
-            position="center"
-            content={({ viewBox }) => {
-              if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                return (
-                  <text
-                    x={viewBox.cx}
-                    y={viewBox.cy}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fontSize={20}
-                    fill="#000"
-                  >
-                    <tspan x={viewBox.cx} dy="-0.6em" fontSize={16}>
-                      Total
-                    </tspan>
-                    <tspan x={viewBox.cx} dy="1.2em" fontSize={28} fontWeight="bold">
-                      {total}
-                    </tspan>
-                  </text>
-                );
-              }
-              return null;
-            }}
-          />
-        </Pie>
-      </PieChart>
-    </ResponsiveContainer>
+        </tbody>
+      </table>
+    </div>
   );
 };
 
-export default ComplianceDonut;
+export default FileUploadTable;
